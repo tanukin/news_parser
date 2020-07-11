@@ -29,6 +29,14 @@ services:
     links:
       - db
 
+  cli:
+    build:
+      context: ./docker/php/cli
+      dockerfile: Dockerfile
+    container_name: cli
+    volumes:
+      - ./:/var/www
+
   db:
     image: mysql:5.7.24
     container_name: db
