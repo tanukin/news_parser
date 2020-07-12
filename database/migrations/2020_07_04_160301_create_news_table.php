@@ -20,8 +20,8 @@ class CreateNewsTable extends Migration
             $table->text('text');
             $table->string('picture');
             $table->string('category');
-            $table->timestamp('publish_date_at');
-            $table->timestamp('source_link');
+            $table->bigInteger('publish_date_at');
+            $table->string('source_link');
         });
     }
 
