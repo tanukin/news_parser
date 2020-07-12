@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 use App\Core\Interfaces\DownloaderInterface;
-use App\Core\News\Services\HttpDownloader;
+use App\Core\Interfaces\NewsBuilderInterface;
+use App\Core\News\Services\ActualNewsDownloader;
+use App\Core\News\Services\NewsBuilder;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -25,9 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->bind(
-            DownloaderInterface::class,
-            HttpDownloader::class
-        );
+        $this->app->bind(DownloaderInterface::class, ActualNewsDownloader::class);
+        $this->app->bind(NewsBuilderInterface::class, NewsBuilder::class);
     }
 }
