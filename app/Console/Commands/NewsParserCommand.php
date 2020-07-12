@@ -58,7 +58,13 @@ class NewsParserCommand extends Command
         $news = $this->downloader->download($rbcLink);
         $count = $this->newsService->createAllNews($news);
 
-        echo sprintf('Загружено %s %s с сайта %s', $count, Lang::choice('пост|поста|постов', $count, [], 'ru'), $rbcLink) . PHP_EOL;
+        echo sprintf('%s %s %s с сайта %s%s',
+                Lang::choice('Загружен|Загружено|Загружено', $count, [], 'ru'),
+                $count,
+                Lang::choice('новый пост|новых поста|новых постов', $count, [], 'ru'),
+                $rbcLink,
+                PHP_EOL
+            );
         return 0;
     }
 }

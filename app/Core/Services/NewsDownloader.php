@@ -11,7 +11,7 @@ class NewsDownloader implements DownloaderInterface
     const NEWS_BLOCK_CLASS = '.article__text';
     const NEWS_SUB_TITLE_CLASS = '.article__text__overview';
     const NEWS_PICTURE_CLASS = '.article__main-image';
-
+    const STORAGE_DEFAULT = 'news';
 
     /** @var Dom */
     private $htmlDom;
@@ -19,10 +19,14 @@ class NewsDownloader implements DownloaderInterface
     /** @var NewsBuilderInterface */
     private $newsBuilder;
 
-    public function __construct(Dom $htmlDom, NewsBuilderInterface $newsBuilder)
+    /** @var ImageUploader */
+    private $imageUploader;
+
+    public function __construct(Dom $htmlDom, NewsBuilderInterface $newsBuilder, ImageUploader $imageUploader)
     {
         $this->htmlDom = $htmlDom;
         $this->newsBuilder = $newsBuilder;
+        $this->imageUploader = $imageUploader;
     }
 
     /**
@@ -63,7 +67,13 @@ class NewsDownloader implements DownloaderInterface
         }
 
         $img = $pictureBlock->find('img');
-        $this->newsBuilder->setPicture($img->getAttribute('src'));
+        $path = $img->getAttribute('src');
+
+        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        $fileName = sprintf("%s.%s", uniqid(), $ext);
+
+        $this->imageUploader->upload($fileName, file_get_contents($path), self::STORAGE_DEFAULT);
+        $this->newsBuilder->setPicture($fileName);
     }
 
     protected function readBody(Dom\Collection $content): void
