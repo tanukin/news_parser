@@ -15,7 +15,7 @@ class NewsService
         $this->newsRepository = $newsRepository;
     }
 
-    public function createAllNews(array $news): int
+    public function createAll(array $news): int
     {
         $inc = 0;
         foreach ($news as $post) {
@@ -39,5 +39,19 @@ class NewsService
         }
 
         return false;
+    }
+
+    public function getAllNewsAnnouncements()
+    {
+        $news = $this->newsRepository->getAllNewsAnnouncements();
+
+        return $news;
+    }
+
+    public function findPost($id)
+    {
+        $post = $this->newsRepository->findPost($id);
+
+        return $post;
     }
 }

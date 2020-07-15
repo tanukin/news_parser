@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class News extends Model
 {
+    const STORAGE = 'news';
+
     public $timestamps = false;
 
     protected $table = 'news';
