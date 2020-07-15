@@ -14,8 +14,8 @@ class ImageUploader
         $this->filesystemManager = $filesystemManager;
     }
 
-    public function upload(string $fileName, string $fileContents, string $disk = 'local')
+    public function upload(string $fileName, string $fileContents, string $disk = 'local'): bool
     {
-        $this->filesystemManager->disk($disk)->put($fileName, $fileContents);
+        return $this->filesystemManager->disk($disk)->put($fileName, $fileContents);
     }
 }

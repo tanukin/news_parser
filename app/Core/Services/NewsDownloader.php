@@ -4,6 +4,7 @@ namespace App\Core\News\Services;
 
 use App\Core\Interfaces\DownloaderInterface;
 use App\Core\Interfaces\NewsBuilderInterface;
+use App\Core\News\Models\News;
 use PHPHtmlParser\Dom;
 
 class NewsDownloader implements DownloaderInterface
@@ -11,7 +12,6 @@ class NewsDownloader implements DownloaderInterface
     const NEWS_BLOCK_CLASS = '.article__text';
     const NEWS_SUB_TITLE_CLASS = '.article__text__overview';
     const NEWS_PICTURE_CLASS = '.article__main-image';
-    const STORAGE_DEFAULT = 'news';
 
     /** @var Dom */
     private $htmlDom;
@@ -40,30 +40,39 @@ class NewsDownloader implements DownloaderInterface
             return [];
         }
 
-        $this->readSubTitle($content);
-        $this->readPicture($content);
-        $this->readBody($content);
+        $subtitle = $pictureLink = $text = null;
+        foreach ($content as $key => $item) {
+            if ($key < 1) {
+                $subtitle = $this->readSubTitle($item);
+                $pictureLink = $this->readPicture($item);
+            }
+            $text = sprintf("%s %s", $text, $this->readBody($item));
+        }
 
-        return [$this->newsBuilder->getNews()];
+        $this->newsBuilder->setSubtitle($subtitle);
+        $this->newsBuilder->setPicture($pictureLink);
+        $this->newsBuilder->setText(trim($text));
+
+        $news = $this->newsBuilder->getNews();
+
+        return [$news];
     }
 
-    protected function readSubTitle(Dom\Collection $content): void
+    protected function readSubTitle(Dom\HtmlNode $content): ?string
     {
         $subTitle = $content->find(self::NEWS_SUB_TITLE_CLASS);
         if ($subTitle->count() === 0) {
-            $this->newsBuilder->setSubtitle('');
-            return;
+            return null;
         }
 
-        $this->newsBuilder->setSubtitle($subTitle->find('span')->text);
+       return $subTitle->find('span')->text;
     }
 
-    protected function readPicture(Dom\Collection $content): void
+    protected function readPicture(Dom\HtmlNode $content): ?string
     {
         $pictureBlock = $content->find(self::NEWS_PICTURE_CLASS);
         if ($pictureBlock->count() === 0) {
-            $this->newsBuilder->setPicture('');
-            return;
+            return null;
         }
 
         $img = $pictureBlock->find('img');
@@ -72,23 +81,26 @@ class NewsDownloader implements DownloaderInterface
         $ext = pathinfo($path, PATHINFO_EXTENSION);
         $fileName = sprintf("%s.%s", uniqid(), $ext);
 
-        $this->imageUploader->upload($fileName, file_get_contents($path), self::STORAGE_DEFAULT);
-        $this->newsBuilder->setPicture($fileName);
+        if (!$this->imageUploader->upload($fileName, file_get_contents($path), News::STORAGE)) {
+            return null;
+        }
+
+        return $fileName;
     }
 
-    protected function readBody(Dom\Collection $content): void
+    protected function readBody(Dom\HtmlNode $content): string
     {
         $paragraphs = $content->find('p');
         if ($paragraphs->count() === 0) {
             $this->newsBuilder->setText('');
-            return;
+            return '';
         }
 
         $text = '';
         foreach ($paragraphs as $paragraph) {
-            $text = sprintf('%s %s', $text, html_entity_decode($paragraph->text));
+            $text = sprintf('%s %s', $text, $paragraph->text);
         }
 
-        $this->newsBuilder->setText(trim($text));
+        return trim($text);
     }
 }

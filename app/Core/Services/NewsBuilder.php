@@ -24,26 +24,26 @@ class NewsBuilder implements NewsBuilderInterface
 
     public function setTitle(string $title): NewsBuilderInterface
     {
-        $this->news->title = htmlentities($title);
+        $this->news->title = $title;
 
         return $this;
     }
 
-    public function setSubtitle(string $subtitle): NewsBuilderInterface
+    public function setSubtitle(?string $subtitle): NewsBuilderInterface
     {
-        $this->news->subtitle = htmlentities($subtitle);
+        $this->news->subtitle = $subtitle;
 
         return $this;
     }
 
     public function setText(string $text): NewsBuilderInterface
     {
-        $this->news->text = htmlentities($text);
+        $this->news->text = $text;
 
         return $this;
     }
 
-    public function setPicture(string $picture): NewsBuilderInterface
+    public function setPicture(?string $picture): NewsBuilderInterface
     {
         $this->news->picture = $picture;
 

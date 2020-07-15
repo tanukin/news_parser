@@ -10,11 +10,11 @@ interface NewsBuilderInterface
 
     public function setTitle(string $title): NewsBuilderInterface;
 
-    public function setSubtitle(string $subtitle): NewsBuilderInterface;
+    public function setSubtitle(?string $subtitle): NewsBuilderInterface;
 
     public function setText(string $text): NewsBuilderInterface;
 
-    public function setPicture(string $picture): NewsBuilderInterface;
+    public function setPicture(?string $picture): NewsBuilderInterface;
 
     public function setCategory(string $category): NewsBuilderInterface;
 
